@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'
 import { state, createGame, joinRoom, seatName, shareGame, setMe } from '../store.js'
 
+import { SPONSOR_URL } from '../config.js'
+
 defineProps({ toast: String })
 const emit = defineEmits(['open', 'arcade', 'clear-toast'])
 
@@ -60,6 +62,25 @@ async function join() {
   }
 }
 
+// 分享 App 本身（不是某個房號）：手機走系統分享選單，電腦就複製網址
+const shareMsg = ref('')
+async function shareApp() {
+  const url = location.origin + location.pathname
+  const data = { title: '麻將記分', text: '麻將記分＋朋友小遊戲，免安裝、免註冊，一起來玩：', url }
+  try {
+    if (navigator.share) {
+      await navigator.share(data)
+      return
+    }
+    await navigator.clipboard.writeText(url)
+    shareMsg.value = '已複製網址，貼給朋友就能開'
+  } catch (e) {
+    if (e?.name === 'AbortError') return // 使用者自己關掉分享選單
+    shareMsg.value = `請手動複製：${url}`
+  }
+  setTimeout(() => (shareMsg.value = ''), 3000)
+}
+
 function summary(g) {
   return g.mode === 'party' ? g.players.map((p) => p.name).join('・') : g.seats.map((_, i) => seatName(g, i)).join('・')
 }
@@ -114,6 +135,13 @@ function summary(g) {
         <span class="muted">兩張一樣的牌，兩個彎以內連得起來就消掉</span>
       </span>
     </button>
+
+    <h2>喜歡的話</h2>
+    <div class="row">
+      <button class="btn" @click="shareApp">📤 分享給朋友</button>
+      <a v-if="SPONSOR_URL" class="btn gold" :href="SPONSOR_URL" target="_blank" rel="noopener" style="text-decoration: none; text-align: center">☕ 請作者喝杯咖啡</a>
+    </div>
+    <p v-if="shareMsg" class="muted" style="margin: 6px 0 0">{{ shareMsg }}</p>
 
     <!-- 遊戲房 -->
     <div v-if="partying" class="overlay" @click.self="partying = false">
