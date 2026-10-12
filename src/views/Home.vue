@@ -5,6 +5,17 @@ import { state, createGame, joinRoom, seatName, shareGame, setMe } from '../stor
 import { SPONSOR_URL } from '../config.js'
 
 defineProps({ toast: String })
+
+// 教學內容頁（靜態頁，由 scripts/build-pages.js 產生）
+const LEARN = [
+  { href: '/beginner/', face: '新', color: '#c0392b', title: '新手教學', desc: '第一次打麻將？名詞、流程、上桌前要講好的事' },
+  { href: '/rules/', face: '規', color: '#1e7a46', title: '基本規則', desc: '16 張玩法、吃碰槓、連莊' },
+  { href: '/tai/', face: '台', color: '#c0392b', title: '台數表', desc: '常見台型一覽' },
+  { href: '/scoring/', face: '算', color: '#1e7a46', title: '台數怎麼算', desc: '底、莊家台、自摸，附算例' },
+  { href: '/patterns/', face: '胡', color: '#c0392b', title: '牌型圖解', desc: '看圖認平胡、清一色' },
+  { href: '/glossary/', face: '詞', color: '#1e7a46', title: '術語大全', desc: '50 個名詞速查' },
+  { href: '/settlement/', face: '帳', color: '#c0392b', title: '結算分帳', desc: '最少轉帳結清' },
+]
 const emit = defineEmits(['open', 'arcade', 'clear-toast'])
 
 const creating = ref(false)
@@ -137,14 +148,15 @@ function summary(g) {
     </button>
 
     <h2>麻將教學</h2>
-    <div class="row" style="flex-wrap: wrap">
-      <a class="btn" href="/rules/" style="text-decoration: none">基本規則</a>
-      <a class="btn" href="/tai/" style="text-decoration: none">台數表</a>
-      <a class="btn" href="/scoring/" style="text-decoration: none">台數怎麼算</a>
-      <a class="btn" href="/patterns/" style="text-decoration: none">牌型圖解</a>
-      <a class="btn" href="/glossary/" style="text-decoration: none">術語大全</a>
-      <a class="btn" href="/settlement/" style="text-decoration: none">結算分帳</a>
-      <a class="btn" href="/beginner/" style="text-decoration: none">新手教學</a>
+    <div class="learn">
+      <a v-for="(l, i) in LEARN" :key="l.href" class="learn-card" :class="{ wide: i === 0 }" :href="l.href">
+        <span class="tile" :style="{ color: l.color }">{{ l.face }}</span>
+        <span class="learn-text">
+          <b>{{ l.title }}</b>
+          <span>{{ l.desc }}</span>
+        </span>
+        <span class="learn-go" aria-hidden="true">›</span>
+      </a>
     </div>
 
     <h2>喜歡的話</h2>

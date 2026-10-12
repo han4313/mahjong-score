@@ -239,6 +239,65 @@ input[type='checkbox'] {
   gap: 4px;
 }
 
+/* 教學入口：兩欄卡片，第一張（新手教學）佔滿一列 */
+.learn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.learn-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.28);
+  transition: transform 0.12s;
+}
+.learn-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+}
+.learn-card.wide {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #fff6d8, var(--paper-2));
+  border: 2px solid var(--gold);
+}
+.learn-card .tile {
+  flex: none;
+  font-size: 20px;
+  width: 38px;
+  height: 46px;
+}
+.learn-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.learn-text b {
+  font-size: 16px;
+}
+.learn-text span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.learn-go {
+  flex: none;
+  font-size: 22px;
+  color: var(--gold-dark);
+}
+@media (max-width: 360px) {
+  .learn {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- 牌局頁面 ---------- */
 .topbar {
   display: flex;
