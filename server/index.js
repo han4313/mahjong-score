@@ -1,4 +1,4 @@
-// 麻將記分的房號同步伺服器（無外部套件）
+// 麻將計分的房號同步伺服器（無外部套件）
 // 房號 = 一份共用的牌局（8 碼隨機）。知道房號的人都能讀寫，所以房號不要亂貼。
 // 放到 Render 等代理後面時設 TRUST_PROXY=1（Render 會自動偵測），限流才會用真實 IP。
 //   POST /api/rooms            建立房間 { game }            -> { code, rev }
@@ -116,6 +116,51 @@ function clientIp(req) {
   return req.socket.remoteAddress || 'x'
 }
 
+// ---- 使用統計（只記匿名編號與數量，不記 IP、不存檔；重啟或休眠後會歸零）----
+const ONLINE_MS = 2 * 60_000
+const clients = new Map() // 匿名編號 -> 最後一次心跳時間
+let statsDay = ''
+let todayClients = new Set()
+let todayRooms = 0
+const taipeiDay = () => new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10)
+function rollDay() {
+  const d = taipeiDay()
+  if (d !== statsDay) {
+    statsDay = d
+    todayClients = new Set()
+    todayRooms = 0
+  }
+}
+function ping(id) {
+  rollDay()
+  if (clients.size < 50_000 || clients.has(id)) clients.set(id, Date.now())
+  if (todayClients.size < 50_000) todayClients.add(id)
+}
+setInterval(() => {
+  const now = Date.now()
+  for (const [id, t] of clients) if (now - t > ONLINE_MS) clients.delete(id)
+}, 60_000).unref()
+
+function stats() {
+  rollDay()
+  const now = Date.now()
+  let online = 0
+  for (const t of clients.values()) if (now - t <= ONLINE_MS) online++
+  let party = 0
+  let active = 0
+  const all = Object.values(rooms)
+  for (const r of all) {
+    if (r.game?.mode === 'party') party++
+    if (now - r.updatedAt <= 3600_000) active++
+  }
+  return {
+    online,
+    today: { visitors: todayClients.size, roomsCreated: todayRooms },
+    rooms: { total: all.length, mahjong: all.length - party, party, activeLastHour: active },
+    since: new Date(Date.now() - process.uptime() * 1000).toISOString(),
+  }
+}
+
 // ---- HTTP ----
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -191,6 +236,18 @@ async function handleApi(req, res, url) {
   const ip = clientIp(req)
   if (limited(ip)) return send(res, 429, { error: '請求太頻繁，請稍後再試' })
 
+  if (url.pathname === '/api/stats' && req.method === 'GET') return send(res, 200, stats())
+  if (url.pathname === '/api/ping' && req.method === 'POST') {
+    try {
+      const body = await readBody(req)
+      if (typeof body?.id !== 'string' || !/^[A-Za-z0-9]{8,40}$/.test(body.id)) return send(res, 400, { error: 'bad id' })
+      ping(body.id)
+      return send(res, 200, { ok: true })
+    } catch (e) {
+      return send(res, 400, { error: e.message })
+    }
+  }
+
   const m = url.pathname.match(/^\/api\/rooms(?:\/([A-Za-z0-9]{4,8})(\/play)?)?$/)
   if (!m) return send(res, 404, { error: 'not found' })
   const code = m[1]?.toUpperCase()
@@ -206,6 +263,10 @@ async function handleApi(req, res, url) {
       const want = typeof body.restore === 'string' ? body.restore.toUpperCase() : ''
       if (want && (!/^[A-Z0-9]{8}$/.test(want) || rooms[want])) return send(res, 409, { error: '房號無法重建' })
       const c = want || newCode()
+      if (!want) {
+        rollDay()
+        todayRooms++
+      }
       rooms[c] = { rev: 1, game: body.game, updatedAt: Date.now() }
       scheduleSave()
       return send(res, 200, { code: c, rev: 1 })

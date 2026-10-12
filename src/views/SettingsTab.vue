@@ -62,7 +62,7 @@ function resetRules() {
     <h2>一起看同一份</h2>
     <div class="card">
       <template v-if="!g.room">
-        <p style="margin: 0 0 10px">目前只有你這支手機看得到。產生房號後，朋友輸入房號就能看同一份戰績、一起記分。</p>
+        <p style="margin: 0 0 10px">目前只有你這支手機看得到。產生房號後，朋友輸入房號就能看同一份戰績、一起計分。</p>
         <button class="btn gold block" :disabled="busy" @click="share">產生房號</button>
         <p v-if="error" class="notice">{{ error }}</p>
       </template>

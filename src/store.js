@@ -71,7 +71,7 @@ export function totalsOf(g) {
 }
 
 // ---------- 牌局 ----------
-/** mode: 'mahjong'（記分牌局）或 'party'（只玩遊戲的房間，不記分） */
+/** mode: 'mahjong'（計分牌局）或 'party'（只玩遊戲的房間，不計分） */
 export function createGame({ name, playerNames, mode = 'mahjong' }) {
   const party = mode === 'party'
   const players = playerNames.map((n, i) => ({ id: uid(), name: n.trim() || `玩家${i + 1}` }))
@@ -141,7 +141,7 @@ export function setStartDealer(g, seatIdx) {
   commit(g)
 }
 
-// ---------- 記分 ----------
+// ---------- 計分 ----------
 export function recordWin(g, { winner, type, loser, tai, labels, skipTsumo }) {
   const { dealer, lian } = dealerState(g)
   const { deltas, taiTotal } = calcWin({ settings: g.settings, dealer, lian, winner, type, loser, tai, skipTsumo })

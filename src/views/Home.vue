@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { state, createGame, joinRoom, seatName, shareGame, setMe } from '../store.js'
 
 import { SPONSOR_URL } from '../config.js'
+import { live, refreshStats } from '../stats.js'
 
 defineProps({ toast: String })
 
@@ -40,7 +41,7 @@ function create() {
   emit('open', g)
 }
 
-// 遊戲房：不記分，開好房間直接玩遊戲。建立時就產生房號，朋友馬上能加入。
+// 遊戲房：不計分，開好房間直接玩遊戲。建立時就產生房號，朋友馬上能加入。
 const partying = ref(false)
 const partyName = ref('')
 const myName = ref('')
@@ -73,11 +74,19 @@ async function join() {
   }
 }
 
+// 首頁每 30 秒更新一次人數與房間數
+let statsTimer = null
+onMounted(() => {
+  refreshStats()
+  statsTimer = setInterval(refreshStats, 30_000)
+})
+onBeforeUnmount(() => clearInterval(statsTimer))
+
 // 分享 App 本身（不是某個房號）：手機走系統分享選單，電腦就複製網址
 const shareMsg = ref('')
 async function shareApp() {
   const url = location.origin + location.pathname
-  const data = { title: '麻將記分', text: '麻將記分＋朋友小遊戲，免安裝、免註冊，一起來玩：', url }
+  const data = { title: '麻將計分', text: '麻將計分＋朋友小遊戲，免安裝、免註冊，一起來玩：', url }
   try {
     if (navigator.share) {
       await navigator.share(data)
@@ -101,9 +110,14 @@ function summary(g) {
   <div class="screen">
     <div class="brand">
       <span class="tile">麻</span>
-      <h1>麻將記分</h1>
+      <h1>麻將計分</h1>
     </div>
     <p class="muted" style="margin: 4px 0 0">資料只存在這支手機；想一起看同一份，就分享房號。</p>
+
+    <p v-if="live.ready" class="live">
+      <span class="dot"></span>目前 <b>{{ live.online }}</b> 人在線・共 <b>{{ live.rooms.total }}</b> 個房間
+      <span class="muted">（牌局 {{ live.rooms.mahjong }}・遊戲房 {{ live.rooms.party }}，今天新開 {{ live.today.roomsCreated }} 個）</span>
+    </p>
 
     <div v-if="toast" class="notice" @click="$emit('clear-toast')">{{ toast }}</div>
 
@@ -122,10 +136,10 @@ function summary(g) {
       </button>
     </div>
     <div class="row" style="margin-top: 14px">
-      <button class="btn gold" @click="startCreate">＋ 新牌局（記分）</button>
+      <button class="btn gold" @click="startCreate">＋ 新牌局（計分）</button>
       <button class="btn" @click="partying = true">🎉 開遊戲房</button>
     </div>
-    <p class="muted" style="margin: 6px 0 0">遊戲房不用記分，開好房間把房號給朋友，就能一起玩骰子、猜拳、誰是臥底…</p>
+    <p class="muted" style="margin: 6px 0 0">遊戲房不用計分，開好房間把房號給朋友，就能一起玩骰子、猜拳、誰是臥底…</p>
 
     <h2>加入朋友的房號</h2>
     <div class="row">

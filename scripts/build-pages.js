@@ -11,7 +11,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const DIST = path.join(here, '..', 'dist')
 const SITE_URL = (process.env.SITE_URL || 'https://mahjong-score-dfom.onrender.com').replace(/\/$/, '')
 const UPDATED = new Date().toISOString().slice(0, 10)
-const SITE_NAME = '麻將記分'
+const SITE_NAME = '麻將計分'
 
 // ---------- 台數表說明（鍵 = defaults.js 的 id）----------
 const TAI_NOTE = {
@@ -90,7 +90,7 @@ function page({ slug, title, description, body }) {
 <body>
 <header class="top">
   <a class="brand" href="/"><span class="tile">麻</span>${SITE_NAME}</a>
-  <a class="cta" href="/">開始記分</a>
+  <a class="cta" href="/">開始計分</a>
 </header>
 <nav class="nav">${nav}</nav>
 <main>
@@ -268,13 +268,13 @@ ${deltaTable(ex({ dealer: 0, lian: 2, winner: 0, type: 'ron', loser: 2, tai: 2 }
 
 <h2>六、一整晚結算</h2>
 <p>打完之後，把每個人的總輸贏相加，就知道誰贏誰輸。要少轉幾次帳，可以讓輸最多的人直接付給贏最多的人，用最少筆數轉完。${SITE_NAME}的「結算」功能會自動排好，並產生可以貼到 LINE 群組的文字。</p>
-<p><a href="/">用${SITE_NAME}記分</a>，不用再拿紙筆和計算機。</p>
+<p><a href="/">用${SITE_NAME}計分</a>，不用再拿紙筆和計算機。</p>
 `,
   },
   {
     slug: 'beginner',
     title: '麻將新手教學：名詞、流程、第一次上桌',
-    description: '第一次打台灣麻將？常見名詞解釋、一局的流程、上桌前要講好的事，還有怎麼用手機記分。',
+    description: '第一次打台灣麻將？常見名詞解釋、一局的流程、上桌前要講好的事，還有怎麼用手機計分。',
     body: `
 <h2>先搞懂這些名詞</h2>
 <table>
@@ -309,7 +309,7 @@ ${deltaTable(ex({ dealer: 0, lian: 2, winner: 0, type: 'ron', loser: 2, tai: 2 }
 <li>放槍的牌要小心：觀察別人丟了什麼、手上留了什麼，比自己湊牌更重要。</li>
 </ul>
 
-<h2>用手機記分</h2>
+<h2>用手機計分</h2>
 <ol>
 <li>打開 <a href="/">${SITE_NAME}</a>，新增牌局，輸入四位玩家的名字。</li>
 <li>每把結束點「登記胡牌」，選誰胡、自摸還是放槍、有哪些台，系統會自動算出每個人輸贏，也會自動換莊與連莊。</li>
@@ -339,6 +339,9 @@ ${deltaTable(ex({ dealer: 0, lian: 2, winner: 0, type: 'ron', loser: 2, tai: 2 }
 <li>請不要在暱稱或名稱中填寫真實姓名以外的個人敏感資料。</li>
 <li>房間資料在長時間沒有使用後會被自動刪除。</li>
 </ul>
+
+<h2>匿名使用人數</h2>
+<p>為了顯示「目前有多少人在線」，你的瀏覽器會產生一組隨機的匿名編號（存在本機，和你的身分無關），並定期通知伺服器。伺服器只計算人數，這組編號不會存檔，伺服器重啟後就會清空。</p>
 
 <h2>伺服器紀錄</h2>
 <p>為了維持服務與防止濫用，伺服器會暫時使用連線的 IP 位址進行請求次數限制，不會將其與你的身分連結，也不會長期保存。</p>

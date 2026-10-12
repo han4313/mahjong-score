@@ -4,6 +4,7 @@ import { state, joinRoom, currentGame } from './store.js'
 import Home from './views/Home.vue'
 import GameScreen from './views/GameScreen.vue'
 import Arcade from './views/Arcade.vue'
+import { startHeartbeat } from './stats.js'
 
 const view = ref('home')
 const toast = ref('')
@@ -20,6 +21,7 @@ function back() {
 
 // 用分享連結（?room=ABC123）打開時自動加入
 onMounted(async () => {
+  startHeartbeat()
   const code = new URLSearchParams(location.search).get('room')
   if (!code) return
   try {

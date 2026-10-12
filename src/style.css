@@ -239,6 +239,21 @@ input[type='checkbox'] {
   gap: 4px;
 }
 
+.live {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.live .dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #4cd37f;
+  box-shadow: 0 0 6px #4cd37f;
+}
+
 /* 教學入口：兩欄卡片，第一張（新手教學）佔滿一列 */
 .learn {
   display: grid;
