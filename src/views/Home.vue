@@ -136,6 +136,17 @@ function summary(g) {
       </span>
     </button>
 
+    <h2>麻將教學</h2>
+    <div class="row" style="flex-wrap: wrap">
+      <a class="btn" href="/rules/" style="text-decoration: none">基本規則</a>
+      <a class="btn" href="/tai/" style="text-decoration: none">台數表</a>
+      <a class="btn" href="/scoring/" style="text-decoration: none">台數怎麼算</a>
+      <a class="btn" href="/patterns/" style="text-decoration: none">牌型圖解</a>
+      <a class="btn" href="/glossary/" style="text-decoration: none">術語大全</a>
+      <a class="btn" href="/settlement/" style="text-decoration: none">結算分帳</a>
+      <a class="btn" href="/beginner/" style="text-decoration: none">新手教學</a>
+    </div>
+
     <h2>喜歡的話</h2>
     <div class="row">
       <button class="btn" @click="shareApp">📤 分享給朋友</button>

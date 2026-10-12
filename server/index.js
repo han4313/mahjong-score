@@ -124,6 +124,9 @@ const MIME = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.json': 'application/json',
+  '.xml': 'application/xml; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
+  '.ico': 'image/x-icon',
 }
 
 const SECURITY = {
@@ -246,6 +249,11 @@ function serveStatic(req, res, url) {
     rel = decodeURIComponent(url.pathname)
   } catch {
     res.writeHead(400).end()
+    return
+  }
+  // /rules 這種沒有斜線也沒有副檔名的網址，導向 /rules/（避免同一頁有兩個網址，影響搜尋排名）
+  if (!rel.endsWith('/') && !path.extname(rel) && rel !== '') {
+    res.writeHead(301, { Location: rel + '/' + url.search }).end()
     return
   }
   if (rel.endsWith('/')) rel += 'index.html'
